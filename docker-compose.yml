@@ -1,0 +1,16 @@
+services:
+  ma-base-de-donnees:
+    image: postgres:16 # :latest signifie que nous utilisons la dernière version de PostgreSQL
+    container_name: projet-ts-postgres # nom du container
+    restart: always # redémarre le container si il se termine
+    ports:
+      - "5432:5432" # port de la base de données
+    environment:
+      POSTGRES_USER: admin # nom de l'utilisateur
+      POSTGRES_PASSWORD: password123 # mot de passe
+      POSTGRES_DB: mon_projet_db # nom de la base de données
+    volumes:
+      - pg_data:/var/lib/postgresql/data # volume pour persister les données
+
+volumes:
+  pg_data: # volume pour persister les données
