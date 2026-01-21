@@ -41,27 +41,44 @@ npm install
     BETTER_AUTH_URL="http://localhost:3000"
     `
 
-## Base de Données (Prisma)
+## Base de Données (Prisma & Docker)
 
-1.   **Initialiser la base de données (Migrations) :**
+## Docker Desktop
+
+Prérequis : Avoir Docker Desktop installé et lancé.
+
+1. **Créer le .env à la racine** :
+
+```bash
+DATABASE_URL="postgresql://admin:password123@localhost:5432/mon_projet_db?schema=public"
+PORT=3000
+```
+
+2. **Démarrage de la base de données** :
+
+```bash
+docker-compose up -d
+```
+
+3.   **Initialiser la base de données :**
 
 ```bash
 npx prisma migrate dev --name init
 ```
 
-    2.  **Générer le client Prisma :**
+    4.  **(Optionnel) Générer le client Prisma :**
 
 ```bash
 npx prisma generate
 ```
 
-3.   **(Optionnel) Seeder la base de données :**
+5.   **(Optionnel) Seeder la base de données :**
 
 ```bash
 npx prisma db seed
 ```
 
-4.   **Explorer la base de données (GUI) :**
+6.   **Explorer la base de données (GUI) :**
 
 ```bash
 npx prisma studio
