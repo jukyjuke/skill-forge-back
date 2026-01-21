@@ -29,17 +29,11 @@ npm install
 ## Configuration
 
 1.   Créer un fichier `.env` à la racine du dossier `skill-forg-server`.
-2.   Ajouter les variables suivantes (adapter selon votre configuration) :
-        `env
-    # Configuration Serveur
-    PORT=3000
-    # Base de données (Prisma)
-    # Format: postgresql://USER:PASSWORD@HOST:PORT/DATABASE
-    DATABASE_URL="postgresql://user:password@localhost:5432/kroma_db"
-    # Authentification (Better-Auth)
-    BETTER_AUTH_SECRET="votre_secret_tres_long_et_securise"
-    BETTER_AUTH_URL="http://localhost:3000"
-    `
+2.   Ajouter les variables suivantes :
+```bash
+DATABASE_URL="postgresql://admin:password123@localhost:5432/mon_projet_db?schema=public"
+PORT=3000
+```
 
 ## Base de Données (Prisma & Docker)
 
@@ -47,7 +41,7 @@ npm install
 
 Prérequis : Avoir Docker Desktop installé et lancé.
 
-1. **Créer le .env à la racine** :
+1. **Créer le .env à la racine (si ce n'est pas déjà fait)** :
 
 ```bash
 DATABASE_URL="postgresql://admin:password123@localhost:5432/mon_projet_db?schema=public"
