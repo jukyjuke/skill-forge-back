@@ -7,7 +7,18 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  trustedOrigins: ["http://localhost:5173"],
+  trustedOrigins: [
+    "http://localhost:5173",
+    "https://skill-forge-pi-ten.vercel.app",
+    "https://skill-forge-back.onrender.com",
+  ],
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+      partitioned: true,
+    },
+  },
   user: {
     // Required to receive custom fields from the client?
     additionalFields: {
