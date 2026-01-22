@@ -10,6 +10,7 @@ import rateLimit from "express-rate-limit";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 
+import { prisma } from "./lib/db";
 import { globalErrorHandler } from "./middlewares/error";
 
 import challengeRouter from "./routes/challenges";
@@ -19,6 +20,8 @@ import socialRouter from "./routes/social";
 import shopRouter from "./routes/shop";
 
 const app = express();
+
+app.set("trust proxy", 1);
 
 const allowedOrigins: string[] = [
   /* Dev */
@@ -53,6 +56,16 @@ app.use("/api/leaderboard", leaderboardRouter);
 app.use("/api/users", userRouter);
 app.use("/api/social", socialRouter);
 app.use("/api/shop", shopRouter);
+
+app.get("/ping", async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.status(200).send("pong & DB active");
+  } catch (error) {
+    console.error("Erreur Ping DB:", error);
+    res.status(200).send("pong & (DB error)");
+  }
+});
 
 app.use(globalErrorHandler);
 
