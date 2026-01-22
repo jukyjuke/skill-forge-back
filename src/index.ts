@@ -25,7 +25,8 @@ const allowedOrigins: string[] = [
   "http://localhost:5173",
 
   /* Prod */
-  // "https://skillforge.com",
+  "https://skill-forge-back.onrender.com",
+  "https://skill-forge-pi-ten.vercel.app",
 ];
 
 const corsOptions = {
