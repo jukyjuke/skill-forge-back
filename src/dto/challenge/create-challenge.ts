@@ -4,7 +4,7 @@ export const CreateChallengeSchema = z.strictObject({
   title: z.string().min(3).max(100),
   description: z.string().min(10).max(500),
   difficulty: z.enum(["EASY", "MEDIUM", "HARD"]),
-  xp: z.number().int().positive(),
+  xp: z.coerce.number().int().positive(),
   coins: z.number().int().nonnegative().default(20),
   tags: z.string(),
   questions: z
