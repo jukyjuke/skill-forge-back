@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ApiError } from "../dto/shared/api-response";
+import { ENV } from "../env";
 
 export const globalErrorHandler = (
   /* The error caught (thrown by a service or via next(error)) */
@@ -20,11 +21,12 @@ export const globalErrorHandler = (
   }
 
   if (err instanceof Error) {
+    const isProduction = ENV.NODE_ENV === "production";
     return res.status(500).json({
       success: false,
       error: {
-        code: err.name,
-        message: err.message,
+        code: isProduction ? "INTERNAL_SERVER_ERROR" : err.name,
+        message: isProduction ? "An internal error has occurred" : err.message,
       },
     } satisfies ApiError);
   }
