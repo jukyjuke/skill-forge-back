@@ -7,9 +7,8 @@ const EnvSchema = z.object({
     .min(1, { message: "DATABASE_URL is required and cannot be empty" }),
   PORT: z.coerce.number().int().positive().max(65535).default(5000),
   NODE_ENV: z
-    .string()
-    .trim()
-    .min(1, { message: "NODE_ENV is required and cannot be empty" }),
+    .enum(["development", "test", "production"])
+    .default("development"),
 });
 
 const parsed = EnvSchema.safeParse(process.env);
