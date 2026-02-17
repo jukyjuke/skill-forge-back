@@ -17,6 +17,12 @@ export class UserController {
         return;
       }
 
+      const sessionUserId = res.locals.session?.user?.id;
+      if (sessionUserId && sessionUserId !== parsed.data.userId) {
+        res.status(403).json({ success: false, error: "Forbidden" });
+        return;
+      }
+
       await this.userService.gainXP(parsed.data);
       res.status(200).json({
         success: true,
@@ -43,6 +49,12 @@ export class UserController {
         return;
       }
 
+      const sessionUserId = res.locals.session?.user?.id;
+      if (sessionUserId && sessionUserId !== parsed.data.userId) {
+        res.status(403).json({ success: false, error: "Forbidden" });
+        return;
+      }
+
       await this.userService.updatePassword(parsed.data);
       res.status(200).json({
         success: true,
@@ -58,6 +70,12 @@ export class UserController {
       const parsed = UpdateEmailSchema.safeParse(req.body);
       if (!parsed.success) {
         res.status(400).json({ success: false, error: parsed.error.message });
+        return;
+      }
+
+      const sessionUserId = res.locals.session?.user?.id;
+      if (sessionUserId && sessionUserId !== parsed.data.userId) {
+        res.status(403).json({ success: false, error: "Forbidden" });
         return;
       }
 
@@ -79,6 +97,12 @@ export class UserController {
           success: false,
           error: "User ID is required and must be a string",
         });
+        return;
+      }
+
+      const sessionUserId = res.locals.session?.user?.id;
+      if (sessionUserId && sessionUserId !== userId) {
+        res.status(403).json({ success: false, error: "Forbidden" });
         return;
       }
 
