@@ -59,6 +59,16 @@ export class ChallengeService {
 
     return await this.prisma.$transaction(
       async (tx) => {
+        /* Verify active challenge */
+        const user = await tx.user.findUnique({
+          where: { id: userID.id },
+          select: { currentChallengeId: true },
+        });
+
+        if (!user || user.currentChallengeId !== challenge.id) {
+          throw new Error("Challenge not started. You must pay a heart to start.");
+        }
+
         const existing = await tx.userChallenge.findUnique({
           where: {
             userId_challengeId: {
@@ -87,19 +97,20 @@ export class ChallengeService {
           tx,
         );
 
-        // 3. Update Challenge Count
+        // 3. Update Challenge Count & Clear Active Challenge
         await tx.user.update({
           where: { id: userID.id },
           data: {
             completedChallengesCount: { increment: 1 },
+            currentChallengeId: null,
           },
         });
 
         // 4. Update Streak
         await this.userService.updateStreak(userID.id, tx);
 
-        // 5. Refund Heart
-        await this.userService.refundHeart(userID.id, tx);
+        // 5. Refund Heart (Up to 5)
+        await this.userService.refundHeart(userID.id, tx, 5);
 
         // 6. Award Challenge Coins
         await this.userService.gainCoins(userID.id, challenge.coins, tx);
@@ -114,27 +125,47 @@ export class ChallengeService {
     userID: IDIdentityDTO,
     challengeCUID: CUIDIdentityDTO,
   ) => {
-    // 1. Check hearts
-    const user = await this.prisma.user.findUnique({
-      where: { id: userID.id },
-      select: { hearts: true },
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Check hearts
+      const user = await tx.user.findUnique({
+        where: { id: userID.id },
+        select: { hearts: true },
+      });
+
+      if (!user || user.hearts <= 0) {
+        throw new Error("No hearts remaining");
+      }
+
+      // 2. Pay the fee
+      await this.userService.loseHeart(userID.id, tx);
+
+      // 3. Set Active Challenge
+      await tx.user.update({
+        where: { id: userID.id },
+        data: { currentChallengeId: challengeCUID.cuid },
+      });
+
+      // 4. Get challenge data
+      const challenge = await tx.challenge.findUnique({
+        where: { id: challengeCUID.cuid },
+        include: {
+          questions: true,
+        },
+      });
+
+      if (!challenge) {
+        throw new Error("Challenge not found");
+      }
+
+      return ChallengeWithQuestionsSchema.parse(challenge);
     });
-
-    if (!user || user.hearts <= 0) {
-      throw new Error("No hearts remaining");
-    }
-
-    // 2. Pay the fee
-    await this.userService.loseHeart(userID.id);
-
-    // 3. Get challenge data
-    return this.getChallengeById(challengeCUID);
   };
 
   failChallenge = async (userID: IDIdentityDTO): Promise<void> => {
-    // No-op in Pay-To-Play model.
-    // Heart is already lost at start.
-    // Keeping method signature for now but doing nothing.
+    await this.prisma.user.update({
+      where: { id: userID.id },
+      data: { currentChallengeId: null },
+    });
   };
 
   // getCompletedChallengesByUserId = async (userID: IDIdentityDTO) => {

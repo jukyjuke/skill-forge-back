@@ -40,7 +40,8 @@ model User {
   hearts        Int       @default(3)
   lastHeartLoss DateTime?
 
-  
+  currentChallengeId String?
+
   sessions      Session[]
   accounts      Account[]
 

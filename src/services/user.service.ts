@@ -200,15 +200,19 @@ export class UserService implements IUserService {
     return user;
   }
 
-  async loseHeart(userId: string): Promise<void> {
-    const user = await this.prisma.user.findUnique({
+  async loseHeart(
+    userId: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<void> {
+    const db = tx || this.prisma;
+    const user = await db.user.findUnique({
       where: { id: userId },
       select: { hearts: true },
     });
 
     if (!user || user.hearts <= 0) return;
 
-    await this.prisma.user.update({
+    await db.user.update({
       where: { id: userId },
       data: {
         hearts: { decrement: 1 },
@@ -221,6 +225,7 @@ export class UserService implements IUserService {
   async refundHeart(
     userId: string,
     tx?: Prisma.TransactionClient,
+    maxHearts: number = 3,
   ): Promise<void> {
     const db = tx || this.prisma;
     const user = await db.user.findUnique({
@@ -228,8 +233,8 @@ export class UserService implements IUserService {
       select: { hearts: true },
     });
 
-    /* If user not found or hearts is 3 or more, return */
-    if (!user || user.hearts >= 3) return;
+    /* If user not found or hearts is maxHearts or more, return */
+    if (!user || user.hearts >= maxHearts) return;
 
     await db.user.update({
       where: { id: userId },
