@@ -18,7 +18,7 @@ export class UserController {
       }
 
       const sessionUserId = res.locals.session?.user?.id;
-      if (sessionUserId && sessionUserId !== parsed.data.userId) {
+      if (!sessionUserId || sessionUserId !== parsed.data.userId) {
         res.status(403).json({ success: false, error: "Forbidden" });
         return;
       }
